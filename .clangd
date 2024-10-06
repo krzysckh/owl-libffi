@@ -1,0 +1,2 @@
+CompileFlags:
+  Add: [ -I/home/kpm/nmojeprogramy/owl/c, -I/usr/local/include, -Wall, -Wextra, -std=c99 ]

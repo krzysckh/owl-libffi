@@ -1,0 +1,7 @@
+*.~undo-tree~
+*.so
+*.o
+test
+test.c
+probe*
+lib.c
