@@ -42,8 +42,8 @@ $ cc -I/path/to/owl/source/c -DPRIM_FP_API -DPRIM_CUSTOM test.c ffi.c -lffi -ldl
 
 ## CAVEATS
 
-- no structs (yet) - you might want to write a wrapper for your library
 - probably won't run under owl-winrt because of the `dlopen` and `dlsym` calls
+  (might get ported some day)
 
 this might be transformed into a [extension](https://gitlab.com/owl-lisp/owl/-/tree/master/ext?ref_type=heads)
 if it turns out that they will stay in owl for good.

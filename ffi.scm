@@ -15,6 +15,10 @@
    dlsym
    call
 
+   defstruct*
+   mkstruct*
+   defstruct ;; use this one probably
+
    func
    funcs
    )
@@ -38,6 +42,9 @@
     (define double 10)
     (define pointer 11)
 
+    (define (unfuck-strings xs)
+      (map (λ (x) (if (string? x) (c-string x) x)) xs))
+
     ;; prepare libffi arg cif
     (define (prep-cif types ret)
       (sys-prim 300 types ret #f))
@@ -54,7 +61,21 @@
 
     ;; call fn with cif and (args)
     (define (call cif fn args)
-      (sys-prim 303 fn cif (map (λ (x) (if (string? x) (c-string x) x)) args)))
+      (sys-prim 303 fn cif (unfuck-strings args)))
+
+    (define (defstruct* types)
+      (sys-prim 304 types #f #f))
+
+    (define (mkstruct* struct xs)
+      (sys-prim 305 struct (unfuck-strings xs) #f))
+
+    ;; (type1 ... typeN) → (values struct-data-ptr make-struct)
+    (define (defstruct . types)
+      (let ((struct (defstruct* types)))
+        (values
+         struct
+         (λ xs
+           (mkstruct* struct (unfuck-strings xs))))))
 
     ;; create a c-function func with library lib, name func-name, return type ret and arg types T ...
     (define-syntax func

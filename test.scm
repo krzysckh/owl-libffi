@@ -1,25 +1,38 @@
 (import
  (owl toplevel)
- (prefix (owl sys) sys/)
  (prefix (ffi) ffi/))
 
-(define (deref-string ptr)
-  (sys/mem-string
-   (fold
-    (λ (acc n) (bior (<< (bytevector-u8-ref ptr n) (* 8 n)) acc))
-    0
-    (iota 0 1 (bytevector-length ptr)))))
+(define (fbool f) (λ () (if (= 0 (f)) #f #t)))
 
 (λ (_)
-  (define-values (malloc strcpy free)
-    (ffi/funcs (ffi/open-library "libc.so")
-      ("malloc" ffi/pointer ffi/uint32)
-      ("strcpy" ffi/pointer ffi/pointer ffi/pointer)
-      ("free"   ffi/void ffi/pointer)))
-
-  (let* ((str (c-string "Hello, World!"))
-         (ptr (malloc (string-length str))))
-    (strcpy ptr str)
-    (print (deref-string ptr))
-    (free ptr))
-  0)
+  (lets ((Color make-Color (ffi/defstruct ffi/uint8 ffi/uint8 ffi/uint8 ffi/uint8))
+         (raywhite (make-Color 245 245 245 255))
+         (gray-ish (make-Color 200 200 200 255))
+         (init-window
+          set-target-fps!
+          begin-drawing
+          clear-background
+          draw-text
+          end-drawing
+          close-window
+          _win-should-close?
+          (ffi/funcs (ffi/open-library "libraylib.so")
+           ("InitWindow" ffi/void ffi/int32 ffi/int32 ffi/pointer)
+           ("SetTargetFPS" ffi/void ffi/int32)
+           ("BeginDrawing" ffi/void)
+           ("ClearBackground" ffi/void Color)
+           ("DrawText" ffi/void ffi/pointer ffi/int32 ffi/int32 ffi/int32 Color)
+           ("EndDrawing" ffi/void)
+           ("CloseWindow" ffi/void)
+           ("WindowShouldClose" ffi/uint8)))
+         (win-should-close? (fbool _win-should-close?)))
+    (init-window 800 450 "sigmon [core] example - basic window")
+    (set-target-fps! 60)
+    (let loop ()
+      (begin-drawing)
+      (clear-background raywhite)
+      (draw-text "Congrats! You created your first window!" 190 200 20 gray-ish)
+      (end-drawing)
+      (if (win-should-close?)
+          0
+          (loop)))))
