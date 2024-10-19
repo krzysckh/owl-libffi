@@ -17,10 +17,12 @@
 
    defstruct*
    mkstruct*
-   defstruct ;; use this one probably
+   defstruct   ;; use this one probably
+   free-struct ;; free struct made with mkstruct* or the 2nd ret-value of defstruct
 
    func
    funcs
+   let-structs
    )
 
   (begin
@@ -69,6 +71,9 @@
     (define (mkstruct* struct xs)
       (sys-prim 305 struct (unfuck-strings xs) #f))
 
+    (define (free-struct struct)
+      (sys-prim 306 struct #f #f))
+
     ;; (type1 ... typeN) → (values struct-data-ptr make-struct)
     (define (defstruct . types)
       (let ((struct (defstruct* types)))
@@ -95,4 +100,17 @@
             (let ((cif (prep-cif (list T ...) ret))
                   (fn (dlsym lib func-name)))
               (λ args (call cif fn args))) ...)))))
+
+    ;; (let-structs ((name0 val0)
+    ;;               (nameN valN))
+    ;;  ...)
+    ;; this is a deferred free-struct for (val0 ... valN)
+    (define-syntax let-structs
+      (syntax-rules ()
+        ((let-structs ((name v) ...) exp ...)
+         (let* ((name v) ...)
+           (let ((ret (begin
+                      exp ...)))
+             (map free-struct (list name ...))
+             ret)))))
     ))

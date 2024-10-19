@@ -144,6 +144,7 @@ prim_custom(int op, word a, word b, word c)
 
     for (i = 0; i < arity; ++i)
       free(values[i]);
+    free(values);
 
     word w = thing_to_word(rc, cif->rtype, &freep);
     if (freep)
@@ -181,6 +182,10 @@ prim_custom(int op, word a, word b, word c)
     }
 
     return PTR(retv);
+  }
+  case 306: { // free-struct ptr → nil
+    free(cptr(a));
+    return INULL;
   }
   }
 
