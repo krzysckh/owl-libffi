@@ -75,6 +75,12 @@
       (sys-prim 306 struct #f #f))
 
     ;; (type1 ... typeN) → (values struct-data-ptr make-struct)
+    ;;                    +--------^^^^^^^^^^^^^^^ ^^^^^^^^^^^----+
+    ;; a type descriptor you can pass to prep-cif/func/funcs      |
+    ;; a function you call to create a struct from its arguments -+
+    ;; (lets ((Tcolor make-color (defstruct uint8 uint8 uint8 uint8)))
+    ;;   (let-structs ((green (make-color 0 255 0 255)))
+    ;;     (print "green@" green)))
     (define (defstruct . types)
       (let ((struct (defstruct* types)))
         (values

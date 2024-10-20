@@ -3,8 +3,8 @@ a WIP ffi library for owl lisp
 ## DEPENDENCIES
 
 - [libffi](https://sourceware.org/libffi/)
-- owl lisp compiled from source (new enough to have FP_API)
-- a c compiler
+- owl lisp compiled from source (new enough to have FP_API - tested with `*owl-version*` 0.2.3a)
+- a local C compiler
 
 ## USAGE
 
